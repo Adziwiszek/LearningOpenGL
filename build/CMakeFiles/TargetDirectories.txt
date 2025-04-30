@@ -1,3 +1,0 @@
-/home/adziw/Projects/LearningOpenGL/build/CMakeFiles/LearningOpenGL.dir
-/home/adziw/Projects/LearningOpenGL/build/CMakeFiles/edit_cache.dir
-/home/adziw/Projects/LearningOpenGL/build/CMakeFiles/rebuild_cache.dir
