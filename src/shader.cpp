@@ -30,7 +30,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     fragmentCode = fShaderStream.str();
   }
   catch (std::ifstream::failure e) {
-    std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+    std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
   }
 
   const char* vShaderCode = vertexCode.c_str();
@@ -64,7 +64,8 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
   {
     glGetShaderInfoLog(vertex, 512, NULL, infoLog);
     std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" <<
-      infoLog << std::endl;
+      infoLog << 
+      "\nFile: " << fragmentPath << std::endl;
   };
 
   // shader program
@@ -116,3 +117,6 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const
   glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void Shader::setVec3(const std::string& name, const float v1, const float v2, const float v3) const {
+  glUniform3f(glGetUniformLocation(ID, name.c_str()), v1, v2, v3);
+}
