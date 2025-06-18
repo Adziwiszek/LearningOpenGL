@@ -105,7 +105,15 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
   // normal vector attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+  /* glVertexAttribPointer:
+   *  index of attrib to be modified, 
+   *  size of attrib, 
+   *  type, 
+   *  normalized, 
+   *  stride, 
+   *  pointer, offset to first component
+   */
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 
   unsigned int lightVAO;
@@ -133,6 +141,7 @@ int main() {
     lightShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
     lightShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
     lightShader.setVec3("lightPos", lightPos);  
+    lightShader.setVec3("viewPos", camera.Position);
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
