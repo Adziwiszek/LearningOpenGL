@@ -30,10 +30,13 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height); 
 void processInput(GLFWwindow* window);
+void orbitLight(glm::vec3& position, float deltaTime);
 GLFWwindow* setupGlfw();
 
 //lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightUp(1.0f, 0.0f, 0.0f);
+const glm::vec3 center(0.0f, 0.0f, 0.0f);
 
 int main() {
   GLFWwindow* window { setupGlfw() };
@@ -125,6 +128,7 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
+
   while(!glfwWindowShouldClose(window)) {
     float currentFrame = static_cast<float>(glfwGetTime());
     deltaTime = currentFrame - lastFrame;
@@ -137,11 +141,22 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    //orbitLight(lightPos, deltaTime);
+
     lightShader.use();
     lightShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
     lightShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
     lightShader.setVec3("lightPos", lightPos);  
     lightShader.setVec3("viewPos", camera.Position);
+
+    lightShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+    lightShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+    lightShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    lightShader.setFloat("material.shininess", 32.0f);
+
+    lightShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+    lightShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -266,3 +281,10 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
+void orbitLight(glm::vec3& positon, float deltaTime) {
+  // change light position
+  float lightSpeed = 2.0f;
+  glm::vec3 toLight = lightPos - center;
+  glm::vec3 lightRight = glm::normalize(glm::cross(toLight, lightUp));
+  lightPos += lightRight * lightSpeed * deltaTime;
+}
