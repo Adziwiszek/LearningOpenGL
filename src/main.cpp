@@ -95,6 +95,18 @@ int main() {
      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+  }; 
+  glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
   };
   // first, configure the cube's VAO (and VBO)
   unsigned int VBO, cubeVAO;
@@ -105,10 +117,6 @@ int main() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glBindVertexArray(cubeVAO);
-  // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-  // normal vector attribute
   /* glVertexAttribPointer:
    *  index of attrib to be modified, 
    *  size of attrib, 
@@ -117,10 +125,10 @@ int main() {
    *  stride, 
    *  pointer, offset to first component
    */
-  // norm attribute 
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
-  // texture attribute
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
@@ -149,22 +157,36 @@ int main() {
     processInput(window);
 
     // rendering
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //orbitLight(lightPos, deltaTime);
 
     lightShader.use();
-    lightShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+    //lightShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
     lightShader.setVec3("viewPos", camera.Position);
 
-    lightShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     lightShader.setFloat("material.shininess", 32.0f);
 
+    /*
     lightShader.setVec3("light.position", lightPos);  
     lightShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
     lightShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
     lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    */
+    //lightShader.setVec3("dirLight.position", lightPos);  
+    lightShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    lightShader.setVec3("dirLight.ambient",  0.2f, 0.2f, 0.2f);
+    lightShader.setVec3("dirLight.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    lightShader.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
+
+    lightShader.setFloat("pointLights[0].constant",  1.0f);
+    lightShader.setFloat("pointLights[0].linear",    0.09f);
+    lightShader.setFloat("pointlights[0].quadratic", 0.0032f);
+    lightShader.setVec3("pointLights[0].ambient",  0.2f, 0.2f, 0.2f);
+    lightShader.setVec3("pointLights[0].diffuse",  0.5f, 0.5f, 0.5f); 
+    lightShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    lightShader.setVec3("pointLights[0].position", lightPos);
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -185,7 +207,17 @@ int main() {
 
     // render the cube
     glBindVertexArray(cubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    //glDrawArrays(GL_TRIANGLES, 0, 36);
+    for(unsigned int i = 0; i < 10; i++)
+    {
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, cubePositions[i]);
+      float angle = 20.0f * i;
+      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      lightShader.setMat4("model", model);
+
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     // also draw the lamp object
     cubeShader.use();
@@ -205,6 +237,8 @@ int main() {
   }
 
   glDeleteBuffers(1, &VBO);
+  glDeleteVertexArrays(1, &cubeVAO);
+  glDeleteVertexArrays(1, &lightVAO);
 
   glfwTerminate();
   return 0;
