@@ -6,6 +6,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "shader.hpp"
 #include "camera.hpp"
 
@@ -40,6 +44,7 @@ glm::vec3 lightUp(1.0f, 0.0f, 0.0f);
 const glm::vec3 center(0.0f, 0.0f, 0.0f);
 
 int main() {
+  Assimp::Importer importer;
   GLFWwindow* window { setupGlfw() };
 
   if(!window) {

@@ -12,11 +12,16 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
 find_package(OpenGL REQUIRED)
 find_package(glm REQUIRED)
-
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
+find_package(assimp REQUIRED)
 
-include_directories(${GLFW_INCLUDE_DIRS} include)
+include_directories(
+  ${GLFW_INCLUDE_DIRS} 
+  ${ASSIMP_INCLUDE_DIRS}
+  include
+)
+
 add_executable(${PROJECT_NAME} 
   ${SOURCES}
   src/glad.c
@@ -26,4 +31,5 @@ link_directories(${GLFW_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} 
   ${OPENGL_LIBRARIES} 
   ${GLFW_LIBRARIES}
+  assimp::assimp
 )
