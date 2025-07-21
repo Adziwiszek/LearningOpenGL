@@ -1,0 +1,11 @@
+newmtl Material
+
+# Diffuse map (color)
+map_Kd ../textures/food_0006_color_2k.jpg
+
+# Ambient occlusion map (optional)
+map_Ka ../textures/food_0006_ao_2k.jpg
+
+# Roughness map (optional — OBJ doesn't support roughness well, but custom loaders might)
+# If using specular workflow:
+map_Ks ../textures/food_0006_roughness_2k.jpg
